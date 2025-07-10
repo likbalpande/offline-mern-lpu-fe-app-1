@@ -3,7 +3,8 @@ import { Navbar } from "../components/Navbar";
 
 const ProfilePage = () => {
     const [products, setProducts] = useState([]);
-
+    const [editProductId, setEditProductId] = useState("");
+    const [updatedPrice, setUpdatedPrice] = useState(-1);
     const getData = async () => {
         try {
             const resp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/products`, {
@@ -57,6 +58,29 @@ const ProfilePage = () => {
         }
     };
 
+    const handleEditProduct = async (productId) => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/products/${productId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    price: updatedPrice,
+                }),
+                headers: { "content-type": "application/json" },
+            });
+
+            if (res.status === 200) {
+                alert("Product Updated");
+                // ...
+            } else {
+                const result = await res.json();
+                alert("Error while updating product:", result.message);
+            }
+        } catch (err) {
+            alert("Cannot update product:", err.message);
+            console.log("Cannot update product:", err.message);
+        }
+    };
+
     return (
         <div>
             <Navbar />
@@ -88,7 +112,39 @@ const ProfilePage = () => {
                     return (
                         <div key={elem._id} className="p-4 rounded-lg border-1">
                             <p>{elem.title}</p>
-                            <p>{elem.price}</p>
+                            {elem._id === editProductId ? (
+                                <>
+                                    <input
+                                        value={updatedPrice}
+                                        onChange={(e) => setUpdatedPrice(e.target.value)}
+                                        className="py-1 px-2 border-1 rounded-md"
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            setEditProductId("");
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            handleEditProduct(elem._id);
+                                        }}
+                                    >
+                                        Update
+                                    </button>
+                                </>
+                            ) : (
+                                <p>{elem.price}</p>
+                            )}
+                            <button
+                                onClick={() => {
+                                    setEditProductId(elem._id);
+                                }}
+                                className="py-1 px-2 border-1 rounded-md"
+                            >
+                                Edit
+                            </button>
                         </div>
                     );
                 })}
