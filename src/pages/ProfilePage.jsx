@@ -70,10 +70,11 @@ const ProfilePage = () => {
 
             if (res.status === 200) {
                 alert("Product Updated");
-                // ...
+                setEditProductId("");
+                getData();
             } else {
                 const result = await res.json();
-                alert("Error while updating product:", result.message);
+                alert(`Error while updating product: ${result.message}`);
             }
         } catch (err) {
             alert("Cannot update product:", err.message);
@@ -135,16 +136,19 @@ const ProfilePage = () => {
                                     </button>
                                 </>
                             ) : (
-                                <p>{elem.price}</p>
+                                <>
+                                    <p>{elem.price}</p>
+                                    <button
+                                        onClick={() => {
+                                            setEditProductId(elem._id);
+                                            setUpdatedPrice(elem.price);
+                                        }}
+                                        className="py-1 px-2 border-1 rounded-md"
+                                    >
+                                        Edit
+                                    </button>
+                                </>
                             )}
-                            <button
-                                onClick={() => {
-                                    setEditProductId(elem._id);
-                                }}
-                                className="py-1 px-2 border-1 rounded-md"
-                            >
-                                Edit
-                            </button>
                         </div>
                     );
                 })}
